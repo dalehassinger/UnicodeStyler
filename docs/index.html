@@ -6,429 +6,458 @@
 <title>Unicode Styler for Mac</title>
 <meta name="description" content="A free macOS menu bar app that turns plain text into Unicode bold, italic and sans-serif styles you can paste into LinkedIn, X, Slack, Teams and email.">
 <meta property="og:title" content="Unicode Styler for Mac">
-<meta property="og:description" content="Bold and italic text you can paste anywhere, from your menu bar. Free, offline, open source.">
+<meta property="og:description" content="Bold and italic text, one click from your menu bar. Free, offline, open source.">
 <meta property="og:type" content="website">
 <meta name="author" content="Dale Hassinger">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232E56D6'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='700' font-style='italic' text-anchor='middle' fill='white'%3EB%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#111c22">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2349afd9'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='700' font-style='italic' text-anchor='middle' fill='%23111c22'%3EB%3C/text%3E%3C/svg%3E">
 <style>
+  /* Same colour scheme as DBH Insights: VMware Clarity dark palette */
   :root {
-    --paper:   #F6F8FC;
-    --surface: #FFFFFF;
-    --ink:     #17213A;
-    --muted:   #56627F;
-    --rule:    #D6DEEC;
-    --grid:    #E6ECF6;
-    --cobalt:  #2E56D6;
-    --cobalt-ink: #FFFFFF;
-    --cobalt-soft: #E8EEFD;
-    --done:    #1F8A5B;
-    --code-bg: #EEF2F9;
-    --shadow:  0 1px 0 rgba(23,33,58,.04), 0 18px 40px -18px rgba(23,33,58,.28);
-
-    --serif: "STIX Two Text", "Iowan Old Style", Georgia, serif;
-    --sans:  "Atkinson Hyperlegible", -apple-system, "Segoe UI", sans-serif;
-    --mono:  ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color-scheme: dark;
+    --page-bg:      #111c22;
+    --app-bg:       #1b2a32;
+    --deep:         #0e171c;
+    --surface:      #22343c;
+    --surface-2:    #2a3f49;
+    --border:       #314351;
+    --border-strong:#495a63;
+    --text:         #eaedf0;
+    --text-dim:     #adbbc4;
+    --text-faint:   #798d99;
+    --accent:       #49afd9;
+    --accent-hover: #6ec3e6;
+    --accent-dim:   rgba(73,175,217,.14);
+    --success:      #60b515;
+    --warning:      #f5c348;
+    --danger:       #f54f47;
+    --radius: 10px;
+    --wrap: 1160px;
+    --font: "Metropolis", "Clarity City", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper:   #0E1424;
-      --surface: #161E33;
-      --ink:     #E7ECF7;
-      --muted:   #9AA6C2;
-      --rule:    #2A3552;
-      --grid:    #172038;
-      --cobalt:  #7C9CFF;
-      --cobalt-ink: #0E1424;
-      --cobalt-soft: #1D2846;
-      --done:    #4CC38A;
-      --code-bg: #121A2D;
-      --shadow:  0 1px 0 rgba(0,0,0,.2), 0 18px 40px -18px rgba(0,0,0,.7);
-    }
-  }
-  :root[data-theme="dark"] {
-    --paper:   #0E1424;
-    --surface: #161E33;
-    --ink:     #E7ECF7;
-    --muted:   #9AA6C2;
-    --rule:    #2A3552;
-    --grid:    #172038;
-    --cobalt:  #7C9CFF;
-    --cobalt-ink: #0E1424;
-    --cobalt-soft: #1D2846;
-    --done:    #4CC38A;
-    --code-bg: #121A2D;
-    --shadow:  0 1px 0 rgba(0,0,0,.2), 0 18px 40px -18px rgba(0,0,0,.7);
-  }
-
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 17px;
-    line-height: 1.6;
+    margin: 0; background: var(--page-bg); color: var(--text);
+    font: 16px/1.6 var(--font);
   }
-  a { color: var(--cobalt); text-underline-offset: 3px; }
-  :focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 4px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  img, svg { display: block; }
+  code { font-family: var(--mono); font-size: .9em; background: var(--deep); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; white-space: nowrap; }
+  pre { margin: 0; font: 13.5px/1.65 var(--mono); background: var(--deep); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; color: var(--text); }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: pre; }
 
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  .skip { position: absolute; left: -9999px; top: 8px; background: var(--accent); color: var(--deep); padding: 8px 14px; border-radius: 6px; z-index: 100; }
+  .skip:focus { left: 12px; }
 
-  /* Header */
-  .top {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 0;
-  }
-  .brand {
-    display: flex; align-items: center; gap: 10px;
-    font-family: var(--serif); font-weight: 700; font-size: 20px;
-    color: var(--ink); text-decoration: none;
-  }
-  .brand-mark {
-    width: 30px; height: 30px; border-radius: 8px;
-    background: var(--cobalt); color: var(--cobalt-ink);
-    display: grid; place-items: center;
-    font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 19px;
-  }
-  .top nav { display: flex; gap: 22px; font-size: 15px; }
-  .top nav a { color: var(--muted); text-decoration: none; }
-  .top nav a:hover { color: var(--ink); }
-
-  /* Hero: a sheet of graph paper, the notebook these characters were made for */
-  .hero {
-    background-color: var(--paper);
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 28px 28px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 470px);
-    gap: 56px;
-    align-items: start;
-    padding: 56px 0 72px;
-  }
-  .hero h1 {
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: clamp(40px, 5.6vw, 64px);
-    line-height: 1.04;
-    letter-spacing: -0.01em;
-    margin: 8px 0 22px;
-  }
-  .lede { font-size: 19px; color: var(--muted); max-width: 44ch; margin: 0 0 30px; }
-  .lede strong { color: var(--ink); font-weight: 700; }
-
-  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  /* Buttons */
   .btn {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 22px; border-radius: 10px;
-    font: 700 17px/1 var(--sans); text-decoration: none; cursor: pointer;
-    border: 1px solid transparent;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 20px; border-radius: 8px; font: 600 15px/1 var(--font);
+    border: 1px solid transparent; cursor: pointer; white-space: nowrap;
   }
-  .btn-primary { background: var(--cobalt); color: var(--cobalt-ink); }
-  .btn-primary:hover { filter: brightness(1.08); }
-  .btn-quiet { background: var(--surface); color: var(--ink); border-color: var(--rule); }
-  .btn-quiet:hover { border-color: var(--muted); }
-  .btn svg { width: 18px; height: 18px; flex: none; }
-  .fine { margin: 16px 0 0; font-size: 14px; color: var(--muted); }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .btn-primary { background: var(--accent); color: var(--deep); }
+  .btn-primary:hover { background: var(--accent-hover); color: var(--deep); }
+  .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-strong); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+  .btn-sm { padding: 8px 14px; font-size: 14px; }
+  .btn-lg { padding: 14px 24px; font-size: 16px; }
 
-  /* Live demo, drawn like the app's menu bar panel */
-  .demo {
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    padding: 16px;
+  /* Top nav */
+  .topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(17,28,34,.78);
+    -webkit-backdrop-filter: saturate(140%) blur(12px); backdrop-filter: saturate(140%) blur(12px);
+    border-bottom: 1px solid var(--border);
   }
-  .demo-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
+  .topnav-inner { display: flex; align-items: center; gap: 28px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; font-size: 17px; }
+  .brand:hover { color: var(--text); }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: var(--deep);
+    display: grid; place-items: center; font: italic 700 18px/1 Georgia, serif;
   }
-  .demo-head h2 { font: 700 15px/1 var(--sans); margin: 0; }
-  .demo-head span { font-size: 13px; color: var(--muted); }
+  .topnav-links { display: flex; gap: 22px; margin-right: auto; }
+  .topnav-links a { color: var(--text-dim); font-size: 14px; }
+  .topnav-links a:hover { color: var(--text); }
+  .topnav-actions { display: flex; gap: 10px; }
+
+  /* Hero */
+  .hero {
+    position: relative; overflow: hidden; padding: 72px 0 64px; text-align: center;
+    background:
+      radial-gradient(900px 480px at 50% -10%, rgba(73,175,217,.22), transparent 70%),
+      radial-gradient(600px 400px at 85% 30%, rgba(96,181,21,.08), transparent 70%),
+      var(--page-bg);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(173,187,196,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(173,187,196,.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
+            mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
+  }
+  .hero-inner { position: relative; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 5px 14px 5px 5px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px;
+  }
+  .pill b { background: var(--accent-dim); color: var(--accent); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+  .pill:hover { color: var(--text); border-color: var(--border-strong); }
+  .hero h1 {
+    margin: 22px auto 18px; max-width: 18ch;
+    font-size: clamp(38px, 6vw, 64px); line-height: 1.06; letter-spacing: -.02em; font-weight: 700;
+    background: linear-gradient(180deg, #ffffff 30%, #9fd6ee 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero .lede { max-width: 640px; margin: 0 auto 30px; color: var(--text-dim); font-size: 18px; }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .hero-note { margin: 16px 0 0; color: var(--text-faint); font-size: 14px; }
+
+  /* Framed "window" shot, holding the live demo */
+  .shot {
+    margin: 0; background: var(--app-bg); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 30px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.02);
+  }
+  .shot-bar {
+    display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px;
+    background: var(--deep); border-bottom: 1px solid var(--border);
+  }
+  .shot-bar i { width: 11px; height: 11px; border-radius: 50%; background: var(--border-strong); }
+  .shot-bar i:nth-child(1) { background: #f54f47; } .shot-bar i:nth-child(2) { background: #f5c348; } .shot-bar i:nth-child(3) { background: #60b515; }
+  .shot-bar span { margin-left: 10px; color: var(--text-faint); font-size: 13px; }
+  .shot-hero { max-width: 760px; margin: 52px auto 0; text-align: left; }
+  figcaption { color: var(--text-faint); font-size: 13px; text-align: center; padding: 12px 16px 14px; border-top: 1px solid var(--border); background: var(--deep); }
+
+  .demo { padding: 18px; }
+  .demo-row { display: flex; gap: 10px; align-items: stretch; }
   .demo label { position: absolute; left: -9999px; }
   .demo textarea {
-    width: 100%; min-height: 64px; resize: vertical;
-    font: 16px/1.4 var(--sans); color: var(--ink);
-    background: var(--paper); border: 1px solid var(--rule); border-radius: 8px;
-    padding: 10px 12px;
+    flex: 1; min-height: 52px; resize: vertical;
+    font: 16px/1.4 var(--font); color: var(--text);
+    background: var(--deep); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
   }
-  .demo textarea:focus-visible { outline-offset: 1px; }
-  .styles { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 5px; }
+  .demo textarea:focus { border-color: var(--accent); outline: none; }
+  .styles { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .styles button {
-    width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto;
-    align-items: center; gap: 10px; text-align: left;
-    background: var(--cobalt-soft); color: var(--ink);
-    border: 1px solid transparent; border-radius: 8px;
-    padding: 7px 10px; cursor: pointer; font-family: inherit;
+    width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px;
+    text-align: left; font-family: inherit; color: var(--text); cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
   }
-  .styles button:hover { border-color: var(--cobalt); }
-  .style-name { display: block; font-size: 12px; color: var(--muted); line-height: 1.3; }
-  .style-out {
-    display: block; font-size: 16px; line-height: 1.45;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .copy-state { font-size: 13px; color: var(--muted); min-width: 52px; text-align: right; }
-  .styles button.copied { border-color: var(--done); }
-  .styles button.copied .copy-state { color: var(--done); font-weight: 700; }
-  .demo-foot { margin: 12px 2px 0; font-size: 13px; color: var(--muted); }
+  .styles button:hover { border-color: var(--accent); background: var(--surface-2); }
+  .style-name { display: block; font-size: 12px; color: var(--text-faint); line-height: 1.3; }
+  .style-out { display: block; font-size: 16px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .copy-state { font-size: 12px; color: var(--text-faint); min-width: 48px; text-align: right; }
+  .styles button.copied { border-color: var(--success); }
+  .styles button.copied .copy-state { color: var(--success); font-weight: 700; }
+
+  /* Stats strip */
+  .stats { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--deep); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .stat { padding: 26px 20px; text-align: center; }
+  .stat + .stat { border-left: 1px solid var(--border); }
+  .stat strong { display: block; font-size: 28px; line-height: 1.2; color: var(--text); }
+  .stat span { color: var(--text-dim); font-size: 14px; }
 
   /* Sections */
-  section.band { padding: 80px 0; border-bottom: 1px solid var(--rule); }
-  .band h2 {
-    font-family: var(--serif); font-weight: 700;
-    font-size: clamp(30px, 3.6vw, 40px); line-height: 1.12;
-    margin: 0 0 14px;
-  }
-  .band .intro { color: var(--muted); max-width: 60ch; margin: 0 0 40px; font-size: 18px; }
-  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+  .section { padding: 88px 0; }
+  .section-alt { background: var(--app-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .section-head { max-width: 680px; margin: 0 0 40px; }
+  .section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+  .kicker { color: var(--accent); font-weight: 600; font-size: 14px; margin: 0 0 8px; }
+  .section h2 { font-size: clamp(28px, 3.6vw, 38px); line-height: 1.15; letter-spacing: -.01em; margin: 0 0 12px; }
+  .section-head p { color: var(--text-dim); font-size: 17px; margin: 0; }
 
-  .features { list-style: none; padding: 0; margin: 0; display: grid; gap: 22px; }
-  .features h3 { font: 700 18px/1.3 var(--sans); margin: 0 0 4px; }
-  .features p { margin: 0; color: var(--muted); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .card h3 { font-size: 17px; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
+  .card p { margin: 0; color: var(--text-dim); font-size: 15px; }
+  .card ul { margin: 10px 0 0; padding-left: 18px; color: var(--text-dim); font-size: 15px; }
+  .card ul li { margin-bottom: 4px; }
+  .badge { font-size: 11px; font-weight: 700; color: var(--success); background: rgba(96,181,21,.14); border-radius: 999px; padding: 2px 8px; }
+  .icon {
+    width: 36px; height: 36px; border-radius: 8px; background: var(--accent-dim); color: var(--accent);
+    display: grid; place-items: center; margin-bottom: 14px;
+  }
+  .icon svg { width: 18px; height: 18px; }
 
-  .shot {
-    border: 1px solid var(--rule); border-radius: 14px; background: var(--surface);
-    box-shadow: var(--shadow); padding: 22px;
-  }
-  .shot h3 { font: 700 15px/1.3 var(--sans); margin: 0 0 14px; }
-  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 22px; }
-  .seg button {
-    font: 15px/1 var(--sans); padding: 10px 0; border: 0; cursor: pointer;
-    background: transparent; color: var(--ink);
-  }
-  .seg button + button { border-left: 1px solid var(--rule); }
-  .seg button[aria-pressed="true"] { background: var(--cobalt); color: var(--cobalt-ink); font-weight: 700; }
-  .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-  .switch { width: 44px; height: 26px; border-radius: 13px; background: var(--cobalt); position: relative; flex: none; }
-  .switch::after { content: ""; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
-  .shot .note { font-size: 13px; color: var(--muted); margin: 18px 0 0; }
-
-  /* Install steps: a real sequence, so they are numbered */
-  .steps { list-style: none; counter-reset: step; padding: 0; margin: 0; display: grid; gap: 28px; }
-  .steps li { counter-increment: step; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; }
-  .steps li::before {
-    content: counter(step);
-    width: 40px; height: 40px; border-radius: 50%;
-    border: 1.5px solid var(--cobalt); color: var(--cobalt);
-    display: grid; place-items: center;
-    font: 700 18px/1 var(--serif);
-  }
-  .steps h3 { font: 700 18px/1.3 var(--sans); margin: 8px 0 4px; }
-  .steps p { margin: 0; color: var(--muted); }
-
-  .callout {
-    border-left: 4px solid var(--cobalt);
-    background: var(--surface);
-    border-radius: 0 12px 12px 0;
-    padding: 22px 24px;
-  }
-  .callout h3 { font: 700 18px/1.3 var(--sans); margin: 0 0 8px; }
-  .callout p { margin: 0 0 12px; color: var(--muted); }
-  .callout ol { margin: 0 0 14px; padding-left: 20px; color: var(--muted); }
-  .callout ol li { margin-bottom: 4px; }
-
-  code { font-family: var(--mono); font-size: .9em; white-space: nowrap; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
-  pre {
-    font-family: var(--mono); font-size: 14px; line-height: 1.6;
-    background: var(--code-bg); border: 1px solid var(--rule); border-radius: 10px;
-    padding: 14px 16px; margin: 0; overflow-x: auto; color: var(--ink);
-  }
-  pre code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+  .new-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .new-card { border-top: 3px solid var(--accent); }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
   /* How it works */
-  .formula {
-    font-family: var(--serif); font-size: clamp(22px, 2.6vw, 30px);
-    margin: 0 0 28px; line-height: 1.3;
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 0; margin-bottom: 48px; }
+  .flow-node { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
+  .flow-node small { display: block; color: var(--text-faint); font-size: 13px; }
+  .flow-node strong { display: block; font-size: 17px; margin: 4px 0 6px; }
+  .flow-node .sample { font-size: 20px; color: var(--accent); }
+  .flow-arrow { display: grid; place-items: center; color: var(--text-faint); padding: 0 12px; }
+  .flow-arrow svg { width: 28px; height: 28px; }
+  .how-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 40px; align-items: start; }
+  .formula { font: 600 20px/1.4 var(--mono); background: var(--deep); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin: 0 0 24px; }
+  .formula em { color: var(--accent); font-style: normal; }
+  .quirks { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .quirks strong { display: block; }
+  .quirks span { color: var(--text-dim); font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { background: var(--deep); color: var(--text-faint); font-size: 13px; font-weight: 600; }
+  td.glyph { font-size: 22px; width: 56px; color: var(--accent); }
+  .table-note { color: var(--text-faint); font-size: 14px; margin: 14px 0 0; }
+
+  /* Privacy */
+  .security { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .sec-item .icon { background: rgba(96,181,21,.14); color: var(--success); }
+
+  /* Download */
+  .downloads { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .dl-card { position: relative; }
+  .dl-card.primary { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 20px 50px -30px rgba(73,175,217,.6); }
+  .dl-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .dl-head svg { width: 34px; height: 34px; color: var(--text); flex: none; }
+  .dl-head h3 { margin: 0; }
+  .dl-head small { display: block; color: var(--text-faint); font-size: 13px; }
+  .dl-card .btn { margin: 4px 0 16px; }
+  .dl-meta { color: var(--text-faint); font-size: 13px; margin: 0 0 18px; }
+  .steps { list-style: none; counter-reset: s; margin: 0 0 18px; padding: 0; display: grid; gap: 12px; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 12px; color: var(--text-dim); font-size: 15px; }
+  .steps li::before {
+    content: counter(s); width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-dim); color: var(--accent); font-weight: 700; font-size: 13px;
+    display: grid; place-items: center;
   }
-  .formula em { color: var(--cobalt); font-style: italic; }
-  table { width: 100%; border-collapse: collapse; font-size: 15px; }
-  th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--rule); }
-  th { font-weight: 700; color: var(--muted); font-size: 14px; }
-  td.glyph { font-size: 22px; width: 64px; }
-  td code { white-space: nowrap; }
-  .table-wrap { overflow-x: auto; }
-  .aside { color: var(--muted); font-size: 15px; margin: 20px 0 0; }
+  .steps strong { color: var(--text); }
+  .warn { border-left: 3px solid var(--warning); background: var(--deep); border-radius: 0 8px 8px 0; padding: 14px 16px; }
+  .warn p { margin: 0 0 10px; color: var(--text-dim); font-size: 14px; }
+  .warn p strong { color: var(--warning); }
+  .side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; min-width: 0; }
+  .card { min-width: 0; }
 
-  .limits { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
-  .limits strong { display: block; font-size: 17px; }
-  .limits span { color: var(--muted); }
+  /* Release notes */
+  .releases { display: grid; gap: 10px; max-width: 820px; }
+  details.rel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  details.rel summary { cursor: pointer; padding: 14px 18px; display: flex; align-items: center; gap: 12px; list-style: none; }
+  details.rel summary::-webkit-details-marker { display: none; }
+  details.rel summary::before { content: "▸"; color: var(--text-faint); transition: transform .15s; }
+  details.rel[open] summary::before { transform: rotate(90deg); }
+  .rel-tag { font-weight: 700; }
+  .rel-date { color: var(--text-faint); font-size: 14px; margin-left: auto; }
+  .latest { font-size: 11px; font-weight: 700; color: var(--deep); background: var(--accent); border-radius: 999px; padding: 2px 8px; }
+  .rel-body { padding: 0 18px 16px 44px; color: var(--text-dim); font-size: 15px; }
+  .rel-body ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .rel-body li { display: grid; grid-template-columns: 12px 1fr; gap: 10px; align-items: baseline; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot.new { background: var(--success); } .dot.improved { background: var(--accent); } .dot.fixed { background: var(--warning); }
 
-  footer { padding: 40px 0 56px; color: var(--muted); font-size: 15px; }
-  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; }
+  /* CTA + footer */
+  .cta { padding: 80px 0; text-align: center; background: radial-gradient(700px 300px at 50% 100%, rgba(73,175,217,.18), transparent 70%), var(--page-bg); border-top: 1px solid var(--border); }
+  .cta h2 { font-size: clamp(26px, 3.4vw, 36px); margin: 0 0 12px; }
+  .cta p { color: var(--text-dim); margin: 0 0 26px; }
+  .footer { border-top: 1px solid var(--border); padding: 30px 0 40px; background: var(--deep); color: var(--text-faint); font-size: 14px; }
+  .footer-inner { display: flex; flex-wrap: wrap; gap: 14px 24px; justify-content: space-between; align-items: center; }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 18px; }
+  .footer-links a { color: var(--text-dim); }
+  .footer .legal { flex-basis: 100%; margin: 6px 0 0; }
 
-  @media (max-width: 900px) {
-    .hero-grid, .two { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-    .hero-grid { padding: 32px 0 56px; }
-    section.band { padding: 60px 0; }
+  @media (max-width: 980px) {
+    .features, .new-grid { grid-template-columns: repeat(2, 1fr); }
+    .security { grid-template-columns: repeat(2, 1fr); }
+    .how-grid, .downloads { grid-template-columns: minmax(0, 1fr); }
   }
-  @media (max-width: 560px) {
+  @media (max-width: 720px) {
+    .topnav-links { display: none; }
+    .topnav-inner { justify-content: space-between; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(3) { border-left: 0; }
+    .stat:nth-child(n+3) { border-top: 1px solid var(--border); }
+    .styles { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr; }
+    .flow-arrow { padding: 8px 0; transform: rotate(90deg); }
+    .section { padding: 64px 0; }
+    .hero { padding: 48px 0 48px; }
+  }
+  @media (max-width: 420px) {
     .wrap { padding: 0 16px; }
-    .top nav a.hide-sm { display: none; }
-    .btn { width: 100%; justify-content: center; }
+    .features, .new-grid, .security, .stats-grid { grid-template-columns: 1fr; }
+    .stat + .stat { border-left: 0; border-top: 1px solid var(--border); }
+    .hero-ctas .btn { width: 100%; }
+    .topnav-actions .btn-ghost { display: none; }
     .demo { padding: 12px; }
   }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
   @media (prefers-reduced-motion: no-preference) {
-    .styles button, .btn { transition: border-color .15s, filter .15s; }
+    .btn, .styles button, .pill { transition: background .15s, border-color .15s, color .15s; }
   }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<header class="wrap top">
-  <a class="brand" href="#">
-    <span class="brand-mark" aria-hidden="true">B</span>
-    Unicode Styler
-  </a>
-  <nav aria-label="Page">
-    <a class="hide-sm" href="#install">Install</a>
-    <a class="hide-sm" href="#how">How it works</a>
-    <a href="https://github.com/dalehassinger/UnicodeStyler">GitHub</a>
-  </nav>
+<header class="topnav">
+  <div class="wrap topnav-inner">
+    <a class="brand" href="#top" aria-label="Unicode Styler home">
+      <span class="brand-mark" aria-hidden="true">B</span>
+      Unicode Styler
+    </a>
+    <nav class="topnav-links" aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#download">Download</a>
+      <a href="#release-notes">Release notes</a>
+    </nav>
+    <div class="topnav-actions">
+      <a class="btn btn-ghost btn-sm" href="https://github.com/dalehassinger/UnicodeStyler">GitHub</a>
+      <a class="btn btn-primary btn-sm" href="#download">Download</a>
+    </div>
+  </div>
 </header>
 
-<div class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <h1>Bold and italic text you can paste anywhere.</h1>
-      <p class="lede">
-        A small, free Mac app that lives in your menu bar. Type your text, click a style, and paste it into
-        <strong>LinkedIn, X, Slack, Teams or email</strong>. The styling goes with it because it's built from Unicode characters, not formatting.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">
+<main id="main">
+  <section class="hero" id="top">
+    <div class="wrap hero-inner">
+      <a class="pill" href="#whats-new"><b>New</b> Version 1.1 adds Light and Dark themes and start at login</a>
+      <h1>Bold and italic text, one click from your menu bar.</h1>
+      <p class="lede">LinkedIn, X and Slack don't have a bold button. Unicode Styler turns your text into Unicode bold, italic and sans-serif characters that keep their style wherever you paste them.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary btn-lg" href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 17h12"/></svg>
           Download for Mac
         </a>
-        <a class="btn btn-quiet" href="https://github.com/dalehassinger/UnicodeStyler">View source</a>
+        <a class="btn btn-ghost btn-lg" href="#try">Try it in your browser</a>
       </div>
-      <p class="fine">Version 1.1. Requires macOS 13 Ventura or later. Runs on Apple silicon and Intel.</p>
-    </div>
+      <p class="hero-note">Free and open source. macOS 13 or later, Apple silicon and Intel.</p>
 
-    <div class="demo" aria-labelledby="demo-title">
-      <div class="demo-head">
-        <h2 id="demo-title">Try it here first</h2>
-        <span>Click a style to copy</span>
-      </div>
-      <label for="demo-input">Your text</label>
-      <textarea id="demo-input" spellcheck="false">Hello vCommunity 2026</textarea>
-      <ul class="styles" id="styles"></ul>
-      <p class="demo-foot" id="demo-status" role="status" aria-live="polite">This preview runs in your browser. The Mac app does the same thing from your menu bar.</p>
-    </div>
-  </div>
-</div>
-
-<main>
-  <section class="band" aria-labelledby="features-title">
-    <div class="wrap two">
-      <div>
-        <h2 id="features-title">One click from the menu bar</h2>
-        <p class="intro">No browser tab to find, no ads, nothing sent anywhere. It works offline.</p>
-        <ul class="features">
-          <li>
-            <h3>All 10 styles at once</h3>
-            <p>Serif and sans-serif bold, italic and bold italic, plus four alternating patterns. Every style previews live as you type.</p>
-          </li>
-          <li>
-            <h3>Click to copy</h3>
-            <p>A checkmark confirms the copy. Paste and Clear buttons handle the round trip from your clipboard.</p>
-          </li>
-          <li>
-            <h3>Light, Dark or System</h3>
-            <p>Pick an appearance in Settings, or let it follow macOS.</p>
-          </li>
-          <li>
-            <h3>Start at login</h3>
-            <p>One switch adds it to your Mac's Login Items, so it's always in the menu bar.</p>
-          </li>
-        </ul>
-      </div>
-      <div class="shot" aria-label="Settings panel preview">
-        <h3>Settings</h3>
-        <p style="margin:0 0 8px;font-weight:700;font-size:14px">Appearance</p>
-        <div class="seg" id="theme-seg" role="group" aria-label="Page theme preview">
-          <button type="button" data-theme-choice="system" aria-pressed="true">System</button>
-          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
-          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+      <figure class="shot shot-hero" id="try">
+        <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Unicode Styler</span></div>
+        <div class="demo">
+          <label for="demo-input">Your text</label>
+          <div class="demo-row">
+            <textarea id="demo-input" spellcheck="false">Hello vCommunity 2026</textarea>
+          </div>
+          <ul class="styles" id="styles"></ul>
         </div>
-        <p style="margin:0 0 8px;font-weight:700;font-size:14px">Startup</p>
-        <div class="toggle-row">
-          <span>Start Unicode Styler at login</span>
-          <span class="switch" aria-hidden="true"></span>
-        </div>
-        <p class="note">The appearance buttons above switch this page's theme, so you can see both.</p>
-      </div>
+        <figcaption id="demo-status" role="status" aria-live="polite">Type above and click any style to copy it. This preview runs in your browser, and the Mac app does the same thing from your menu bar.</figcaption>
+      </figure>
     </div>
   </section>
 
-  <section class="band" id="install" aria-labelledby="install-title">
+  <section class="stats" aria-label="At a glance">
+    <div class="wrap stats-grid">
+      <div class="stat"><strong>10</strong><span>text styles</span></div>
+      <div class="stat"><strong>1 click</strong><span>to copy</span></div>
+      <div class="stat"><strong>Offline</strong><span>nothing leaves your Mac</span></div>
+      <div class="stat"><strong>Universal</strong><span>Apple silicon and Intel</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="whats-new">
     <div class="wrap">
-      <h2 id="install-title">Install</h2>
-      <p class="intro">About a minute, and you only do the security step once.</p>
-      <div class="two">
-        <ol class="steps">
-          <li>
-            <div>
-              <h3>Download the zip</h3>
-              <p><a href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">UnicodeStyler.zip</a> from the latest GitHub release.</p>
-            </div>
-          </li>
-          <li>
-            <div>
-              <h3>Move it to Applications</h3>
-              <p>Double-click the zip to unpack it, then drag <strong>Unicode Styler</strong> into your Applications folder.</p>
-            </div>
-          </li>
-          <li>
-            <div>
-              <h3>Open it once and approve it</h3>
-              <p>macOS will say it can't verify the developer. Follow the steps on the right. You only do this the first time.</p>
-            </div>
-          </li>
-          <li>
-            <div>
-              <h3>Look in your menu bar</h3>
-              <p>Click the <strong>B/I/U</strong> icon, type your text, and click a style.</p>
-            </div>
-          </li>
-        </ol>
-
-        <div class="callout">
-          <h3>Why macOS warns you, and how to open it</h3>
-          <p>The app isn't signed with a paid Apple Developer ID yet, so Gatekeeper blocks it the first time. It isn't damaged. To open it:</p>
-          <ol>
-            <li>Open the app once and click <strong>Done</strong> on the warning.</li>
-            <li>Go to <strong>System Settings › Privacy &amp; Security</strong>.</li>
-            <li>Scroll down and click <strong>Open Anyway</strong> next to Unicode Styler.</li>
-          </ol>
-          <p>Prefer Terminal? This removes the download flag:</p>
-          <pre><code>xattr -dr com.apple.quarantine "/Applications/Unicode Styler.app"</code></pre>
-        </div>
+      <div class="section-head">
+        <p class="kicker">New in v1.1</p>
+        <h2>Settings, and everything on one screen</h2>
+        <p>The gear icon in the panel opens Settings. Your choices are saved and applied every time the app starts.</p>
+      </div>
+      <div class="new-grid">
+        <article class="card new-card">
+          <h3>Light, Dark or System <span class="badge">New</span></h3>
+          <p>Pick an appearance for the panel.</p>
+          <ul><li>System follows your macOS setting</li><li>Light and Dark override it for this app only</li></ul>
+        </article>
+        <article class="card new-card">
+          <h3>Start at login <span class="badge">New</span></h3>
+          <p>One switch adds Unicode Styler to your Mac's Login Items.</p>
+          <ul><li>Uses the standard macOS Login Items</li><li>If macOS asks for approval, a button takes you there</li></ul>
+        </article>
+        <article class="card new-card">
+          <h3>No scrolling <span class="badge">New</span></h3>
+          <p>All 10 styles fit in the panel at once.</p>
+          <ul><li>Long text is shortened on screen, with the full text on hover</li><li>Clicking always copies the full text</li></ul>
+        </article>
       </div>
     </div>
   </section>
 
-  <section class="band" id="how" aria-labelledby="how-title">
-    <div class="wrap two">
-      <div>
-        <h2 id="how-title">How it works</h2>
-        <p class="intro" style="margin-bottom:28px">The styled text isn't formatting. These are different characters. Unicode's Mathematical Alphanumeric Symbols block has complete alphabets in bold, italic and sans-serif, made for writing math. Each one starts at a fixed code point, so converting a letter is one addition.</p>
-        <p class="formula">styled = <em>start</em> + (letter − A)</p>
-        <ul class="limits">
-          <li><strong>Italic h is in a different place.</strong><span>Unicode already had ℎ as the Planck constant (U+210E), so the italic alphabet has a gap there. The app maps it separately.</span></li>
-          <li><strong>Italic has no digits.</strong><span>Numbers stay plain in italic styles. Bold styles have their own digits.</span></li>
-          <li><strong>Everything else passes through.</strong><span>Spaces, punctuation and emoji are left as they are.</span></li>
-        </ul>
+  <section class="section section-alt" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Everything the web tools do, without the browser tab</h2>
+        <p>It does the same job as sites like YayText, from your menu bar.</p>
       </div>
-      <div>
-        <div class="table-wrap">
+      <div class="features">
+        <article class="card">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h7a4 4 0 0 1 0 8H6zM6 12h8a4 4 0 0 1 0 8H6z"/></svg></div>
+          <h3>Bold, italic and bold italic</h3>
+          <p>In both serif and sans-serif, with bold digits where Unicode has them.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h16"/></svg></div>
+          <h3>Four alternating patterns</h3>
+          <p>Alternating Bold, Alternating Italic, Bold with Alternating Italic, and Italic Switch Serifs.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/></svg></div>
+          <h3>Lives in the menu bar</h3>
+          <p>No Dock icon and no window to manage. Click the icon and the panel opens.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+          <h3>Live preview</h3>
+          <p>Every style updates as you type, so you can see your text in all 10 before you pick one.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></div>
+          <h3>Click to copy</h3>
+          <p>A checkmark confirms the copy. Paste and Clear buttons handle the round trip.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-6-6-6M12 19h8"/></svg></div>
+          <h3>PowerShell version too</h3>
+          <p><code>Convert-UnicodeStyle.ps1</code> does the same conversion from the terminal on macOS, Windows or Linux.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>How it works</h2>
+        <p>The styled text isn't formatting. These are different characters, so the style survives copy and paste into any app that takes text.</p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-node"><small>You type</small><strong>Plain text</strong><span class="sample">Hello</span></div>
+        <div class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="flow-node"><small>Unicode Styler</small><strong>Maps each letter</strong><span class="sample">H → U+1D407</span></div>
+        <div class="flow-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        <div class="flow-node"><small>You paste</small><strong>Styled text</strong><span class="sample">𝐇𝐞𝐥𝐥𝐨</span></div>
+      </div>
+
+      <div class="how-grid">
+        <div>
+          <p style="color:var(--text-dim);margin:0 0 18px">Unicode's Mathematical Alphanumeric Symbols block (U+1D400 to U+1D7FF) has complete alphabets in bold, italic and sans-serif, made for writing math. Each one starts at a fixed code point, so converting a letter is one addition:</p>
+          <p class="formula">styled = <em>start</em> + (letter − 'A')</p>
+          <ul class="quirks">
+            <li><strong>Italic h is somewhere else.</strong><span>Unicode already had ℎ as the Planck constant (U+210E), so the italic alphabet has a gap there. The app maps it separately.</span></li>
+            <li><strong>Italic styles have no digits.</strong><span>Numbers stay plain in italic. Bold has its own 𝟎 to 𝟗.</span></li>
+            <li><strong>Everything else passes through.</strong><span>Spaces, punctuation and emoji are left as they are.</span></li>
+          </ul>
+        </div>
+        <div>
           <table>
             <thead><tr><th scope="col">A</th><th scope="col">Style</th><th scope="col">Starts at</th></tr></thead>
             <tbody>
@@ -440,30 +469,148 @@
               <tr><td class="glyph">𝘼</td><td>Sans bold italic</td><td><code>U+1D63C</code></td></tr>
             </tbody>
           </table>
+          <p class="table-note">Use it for emphasis rather than whole posts. Screen readers may read these characters one at a time, and search won't match 𝐁𝐨𝐥𝐝 to Bold.</p>
         </div>
-        <p class="aside">Use it for emphasis rather than whole posts. Screen readers may read these characters one at a time, and search won't match <span style="white-space:nowrap">𝐁𝐨𝐥𝐝</span> to Bold.</p>
       </div>
     </div>
   </section>
 
-  <section class="band" aria-labelledby="source-title">
-    <div class="wrap two">
-      <div>
-        <h2 id="source-title">Build it yourself</h2>
-        <p class="intro" style="margin-bottom:0">The whole app is one Swift file and a build script. There's no Xcode project. You only need the Command Line Tools (<code>xcode-select --install</code>).</p>
+  <section class="section section-alt" id="privacy">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Private by design</h2>
+        <p>It's a text converter. It doesn't need anything else.</p>
       </div>
-      <pre><code>git clone https://github.com/dalehassinger/UnicodeStyler.git
+      <div class="security">
+        <div class="card sec-item">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.8M19 12.9c-.8-.8-1.7-1.4-2.7-1.9M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 11 4.6M12 20h.01"/></svg></div>
+          <h3>Works offline</h3>
+          <p>The app makes no network connections. The conversion happens on your Mac.</p>
+        </div>
+        <div class="card sec-item">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>Nothing collected</h3>
+          <p>No accounts, analytics or tracking. Your text is never saved.</p>
+        </div>
+        <div class="card sec-item">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></div>
+          <h3>Clipboard on request</h3>
+          <p>It only reads your clipboard when you click Paste, and only writes to it when you click a style.</p>
+        </div>
+        <div class="card sec-item">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg></div>
+          <h3>Open source</h3>
+          <p>One Swift file you can read in a few minutes, and build yourself if you prefer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="download">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Download</h2>
+        <p>About a minute to install. The security step only happens the first time.</p>
+      </div>
+      <div class="downloads">
+        <article class="card dl-card primary">
+          <div class="dl-head">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.5-1-2.5-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg>
+            <div><h3>macOS</h3><small>Universal: Apple silicon and Intel</small></div>
+          </div>
+          <a class="btn btn-primary btn-lg" href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 17h12"/></svg>
+            Download UnicodeStyler.zip
+          </a>
+          <p class="dl-meta">Version 1.1. Requires macOS 13 Ventura or later.</p>
+          <ol class="steps">
+            <li><span>Double-click the zip and drag <strong>Unicode Styler</strong> into Applications.</span></li>
+            <li><span>Open it. macOS will say it can't verify the developer. Follow the steps below.</span></li>
+            <li><span>Click the <strong>B/I/U</strong> icon in your menu bar, type your text, and click a style.</span></li>
+          </ol>
+          <div class="warn">
+            <p><strong>The app isn't signed with an Apple Developer ID yet</strong>, so Gatekeeper blocks it the first time. It isn't damaged. Click <strong style="color:var(--text)">Done</strong>, go to <strong style="color:var(--text)">System Settings › Privacy &amp; Security</strong>, and click <strong style="color:var(--text)">Open Anyway</strong>. Or run this in Terminal:</p>
+            <pre><code>xattr -dr com.apple.quarantine "/Applications/Unicode Styler.app"</code></pre>
+          </div>
+        </article>
+
+        <div class="side">
+          <article class="card">
+            <div class="dl-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 17 6-6-6-6M12 19h8"/></svg>
+              <div><h3>PowerShell</h3><small>Windows, macOS and Linux</small></div>
+            </div>
+            <p>The same 10 styles from the command line, in PowerShell 5.1 or 7.</p>
+            <pre style="margin-top:14px"><code>./Convert-UnicodeStyle.ps1 "Hello" -Style SansBold -Copy</code></pre>
+            <p style="margin-top:14px"><a href="https://github.com/dalehassinger/UnicodeStyler/blob/main/Convert-UnicodeStyle.ps1">Get Convert-UnicodeStyle.ps1</a></p>
+          </article>
+          <article class="card">
+            <div class="dl-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></svg>
+              <div><h3>Build from source</h3><small>Needs only the Command Line Tools</small></div>
+            </div>
+            <pre><code>git clone https://github.com/dalehassinger/UnicodeStyler.git
 cd UnicodeStyler
-chmod +x build.sh
 ./build.sh --install</code></pre>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="release-notes">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Release notes</h2>
+        <p>Every version is on <a href="https://github.com/dalehassinger/UnicodeStyler/releases">GitHub Releases</a>.</p>
+      </div>
+      <div class="releases">
+        <details class="rel" open>
+          <summary><span class="rel-tag">v1.1</span><span class="latest">Latest</span><span class="rel-date">October 2026</span></summary>
+          <div class="rel-body">
+            <ul>
+              <li><span class="dot new"></span><span>Settings panel with Light, Dark and System appearance</span></li>
+              <li><span class="dot new"></span><span>Start at login, using macOS Login Items</span></li>
+              <li><span class="dot improved"></span><span>All 10 styles shown at once, with no scrolling</span></li>
+              <li><span class="dot improved"></span><span>Universal build for Apple silicon and Intel</span></li>
+              <li><span class="dot fixed"></span><span>Builds with only the Command Line Tools, no full Xcode needed</span></li>
+            </ul>
+          </div>
+        </details>
+        <details class="rel">
+          <summary><span class="rel-tag">v1.0</span><span class="rel-date">October 2026</span></summary>
+          <div class="rel-body">
+            <ul>
+              <li><span class="dot new"></span><span>First release: menu bar app with 10 styles, live preview and click to copy</span></li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>Ready to make your next post stand out?</h2>
+      <p>Free, offline, and one click from your menu bar.</p>
+      <a class="btn btn-primary btn-lg" href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 17h12"/></svg>
+        Download for Mac
+      </a>
     </div>
   </section>
 </main>
 
-<footer>
-  <div class="wrap">
+<footer class="footer">
+  <div class="wrap footer-inner">
     <span>Made by Dale Hassinger. Read more at <a href="https://www.vcrocs.info">vCROCS.info</a>.</span>
-    <span><a href="https://github.com/dalehassinger/UnicodeStyler">Source on GitHub</a></span>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/dalehassinger/UnicodeStyler">GitHub</a>
+    </nav>
+    <p class="legal">Unicode Styler is an independent project. macOS is a trademark of Apple Inc.</p>
   </div>
 </footer>
 
@@ -512,7 +659,7 @@ chmod +x build.sh
   const list = document.getElementById("styles");
   const status = document.getElementById("demo-status");
   const defaultStatus = status.textContent;
-  let statusTimer;
+  let timer;
 
   const rows = STYLES.map(([label, cycle]) => {
     const li = document.createElement("li");
@@ -528,17 +675,13 @@ chmod +x build.sh
 
   function render() {
     const text = input.value || "Your text here";
-    for (const r of rows) {
-      r.out.textContent = stylize(text, r.cycle);
-      r.btn.title = r.out.textContent;
-    }
+    for (const r of rows) { r.out.textContent = stylize(text, r.cycle); r.btn.title = r.out.textContent; }
   }
 
   async function copy(btn, label) {
     const value = btn.querySelector(".style-out").textContent;
     let ok = false;
     try { await navigator.clipboard.writeText(value); ok = true; } catch (e) {
-      // Fallback for browsers that block the async clipboard API
       const ta = document.createElement("textarea");
       ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
       document.body.appendChild(ta); ta.select();
@@ -553,8 +696,8 @@ chmod +x build.sh
     } else {
       status.textContent = "Your browser blocked copying. Select the text and copy it by hand.";
     }
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(() => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
       btn.classList.remove("copied");
       btn.querySelector(".copy-state").textContent = "Copy";
       status.textContent = defaultStatus;
@@ -563,17 +706,6 @@ chmod +x build.sh
 
   input.addEventListener("input", render);
   render();
-
-  // Theme preview buttons switch the page theme, like the app's Appearance setting
-  const seg = document.getElementById("theme-seg");
-  function setTheme(choice) {
-    if (choice === "system") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", choice);
-    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.themeChoice === choice)));
-    try { localStorage.setItem("us-theme", choice); } catch (_) {}
-  }
-  seg.addEventListener("click", e => { const b = e.target.closest("button"); if (b) setTheme(b.dataset.themeChoice); });
-  try { const saved = localStorage.getItem("us-theme"); if (saved) setTheme(saved); } catch (_) {}
 </script>
 </body>
 </html>
