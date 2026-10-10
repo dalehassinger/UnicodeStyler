@@ -1,0 +1,5 @@
+# Build output: the app and release zip are published on GitHub Releases, not committed
+build/
+
+# macOS
+.DS_Store

@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unicode Styler for Mac</title>
+<meta name="description" content="A free macOS menu bar app that turns plain text into Unicode bold, italic and sans-serif styles you can paste into LinkedIn, X, Slack, Teams and email.">
+<meta property="og:title" content="Unicode Styler for Mac">
+<meta property="og:description" content="Bold and italic text you can paste anywhere, from your menu bar. Free, offline, open source.">
+<meta property="og:type" content="website">
+<meta name="author" content="Dale Hassinger">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232E56D6'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='700' font-style='italic' text-anchor='middle' fill='white'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=STIX+Two+Text:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:   #F6F8FC;
+    --surface: #FFFFFF;
+    --ink:     #17213A;
+    --muted:   #56627F;
+    --rule:    #D6DEEC;
+    --grid:    #E6ECF6;
+    --cobalt:  #2E56D6;
+    --cobalt-ink: #FFFFFF;
+    --cobalt-soft: #E8EEFD;
+    --done:    #1F8A5B;
+    --code-bg: #EEF2F9;
+    --shadow:  0 1px 0 rgba(23,33,58,.04), 0 18px 40px -18px rgba(23,33,58,.28);
+
+    --serif: "STIX Two Text", "Iowan Old Style", Georgia, serif;
+    --sans:  "Atkinson Hyperlegible", -apple-system, "Segoe UI", sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:   #0E1424;
+      --surface: #161E33;
+      --ink:     #E7ECF7;
+      --muted:   #9AA6C2;
+      --rule:    #2A3552;
+      --grid:    #172038;
+      --cobalt:  #7C9CFF;
+      --cobalt-ink: #0E1424;
+      --cobalt-soft: #1D2846;
+      --done:    #4CC38A;
+      --code-bg: #121A2D;
+      --shadow:  0 1px 0 rgba(0,0,0,.2), 0 18px 40px -18px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:   #0E1424;
+    --surface: #161E33;
+    --ink:     #E7ECF7;
+    --muted:   #9AA6C2;
+    --rule:    #2A3552;
+    --grid:    #172038;
+    --cobalt:  #7C9CFF;
+    --cobalt-ink: #0E1424;
+    --cobalt-soft: #1D2846;
+    --done:    #4CC38A;
+    --code-bg: #121A2D;
+    --shadow:  0 1px 0 rgba(0,0,0,.2), 0 18px 40px -18px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  a { color: var(--cobalt); text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; border-radius: 4px; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  .top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--serif); font-weight: 700; font-size: 20px;
+    color: var(--ink); text-decoration: none;
+  }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--cobalt); color: var(--cobalt-ink);
+    display: grid; place-items: center;
+    font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 19px;
+  }
+  .top nav { display: flex; gap: 22px; font-size: 15px; }
+  .top nav a { color: var(--muted); text-decoration: none; }
+  .top nav a:hover { color: var(--ink); }
+
+  /* Hero: a sheet of graph paper, the notebook these characters were made for */
+  .hero {
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 470px);
+    gap: 56px;
+    align-items: start;
+    padding: 56px 0 72px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(40px, 5.6vw, 64px);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    margin: 8px 0 22px;
+  }
+  .lede { font-size: 19px; color: var(--muted); max-width: 44ch; margin: 0 0 30px; }
+  .lede strong { color: var(--ink); font-weight: 700; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 22px; border-radius: 10px;
+    font: 700 17px/1 var(--sans); text-decoration: none; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--cobalt); color: var(--cobalt-ink); }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-quiet { background: var(--surface); color: var(--ink); border-color: var(--rule); }
+  .btn-quiet:hover { border-color: var(--muted); }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .fine { margin: 16px 0 0; font-size: 14px; color: var(--muted); }
+
+  /* Live demo, drawn like the app's menu bar panel */
+  .demo {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+  .demo-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .demo-head h2 { font: 700 15px/1 var(--sans); margin: 0; }
+  .demo-head span { font-size: 13px; color: var(--muted); }
+  .demo label { position: absolute; left: -9999px; }
+  .demo textarea {
+    width: 100%; min-height: 64px; resize: vertical;
+    font: 16px/1.4 var(--sans); color: var(--ink);
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .demo textarea:focus-visible { outline-offset: 1px; }
+  .styles { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 5px; }
+  .styles button {
+    width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto;
+    align-items: center; gap: 10px; text-align: left;
+    background: var(--cobalt-soft); color: var(--ink);
+    border: 1px solid transparent; border-radius: 8px;
+    padding: 7px 10px; cursor: pointer; font-family: inherit;
+  }
+  .styles button:hover { border-color: var(--cobalt); }
+  .style-name { display: block; font-size: 12px; color: var(--muted); line-height: 1.3; }
+  .style-out {
+    display: block; font-size: 16px; line-height: 1.45;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .copy-state { font-size: 13px; color: var(--muted); min-width: 52px; text-align: right; }
+  .styles button.copied { border-color: var(--done); }
+  .styles button.copied .copy-state { color: var(--done); font-weight: 700; }
+  .demo-foot { margin: 12px 2px 0; font-size: 13px; color: var(--muted); }
+
+  /* Sections */
+  section.band { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+  .band h2 {
+    font-family: var(--serif); font-weight: 700;
+    font-size: clamp(30px, 3.6vw, 40px); line-height: 1.12;
+    margin: 0 0 14px;
+  }
+  .band .intro { color: var(--muted); max-width: 60ch; margin: 0 0 40px; font-size: 18px; }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+
+  .features { list-style: none; padding: 0; margin: 0; display: grid; gap: 22px; }
+  .features h3 { font: 700 18px/1.3 var(--sans); margin: 0 0 4px; }
+  .features p { margin: 0; color: var(--muted); }
+
+  .shot {
+    border: 1px solid var(--rule); border-radius: 14px; background: var(--surface);
+    box-shadow: var(--shadow); padding: 22px;
+  }
+  .shot h3 { font: 700 15px/1.3 var(--sans); margin: 0 0 14px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 22px; }
+  .seg button {
+    font: 15px/1 var(--sans); padding: 10px 0; border: 0; cursor: pointer;
+    background: transparent; color: var(--ink);
+  }
+  .seg button + button { border-left: 1px solid var(--rule); }
+  .seg button[aria-pressed="true"] { background: var(--cobalt); color: var(--cobalt-ink); font-weight: 700; }
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .switch { width: 44px; height: 26px; border-radius: 13px; background: var(--cobalt); position: relative; flex: none; }
+  .switch::after { content: ""; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+  .shot .note { font-size: 13px; color: var(--muted); margin: 18px 0 0; }
+
+  /* Install steps: a real sequence, so they are numbered */
+  .steps { list-style: none; counter-reset: step; padding: 0; margin: 0; display: grid; gap: 28px; }
+  .steps li { counter-increment: step; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; }
+  .steps li::before {
+    content: counter(step);
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1.5px solid var(--cobalt); color: var(--cobalt);
+    display: grid; place-items: center;
+    font: 700 18px/1 var(--serif);
+  }
+  .steps h3 { font: 700 18px/1.3 var(--sans); margin: 8px 0 4px; }
+  .steps p { margin: 0; color: var(--muted); }
+
+  .callout {
+    border-left: 4px solid var(--cobalt);
+    background: var(--surface);
+    border-radius: 0 12px 12px 0;
+    padding: 22px 24px;
+  }
+  .callout h3 { font: 700 18px/1.3 var(--sans); margin: 0 0 8px; }
+  .callout p { margin: 0 0 12px; color: var(--muted); }
+  .callout ol { margin: 0 0 14px; padding-left: 20px; color: var(--muted); }
+  .callout ol li { margin-bottom: 4px; }
+
+  code { font-family: var(--mono); font-size: .9em; white-space: nowrap; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+  pre {
+    font-family: var(--mono); font-size: 14px; line-height: 1.6;
+    background: var(--code-bg); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 14px 16px; margin: 0; overflow-x: auto; color: var(--ink);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; white-space: pre; }
+
+  /* How it works */
+  .formula {
+    font-family: var(--serif); font-size: clamp(22px, 2.6vw, 30px);
+    margin: 0 0 28px; line-height: 1.3;
+  }
+  .formula em { color: var(--cobalt); font-style: italic; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 700; color: var(--muted); font-size: 14px; }
+  td.glyph { font-size: 22px; width: 64px; }
+  td code { white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  .aside { color: var(--muted); font-size: 15px; margin: 20px 0 0; }
+
+  .limits { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
+  .limits strong { display: block; font-size: 17px; }
+  .limits span { color: var(--muted); }
+
+  footer { padding: 40px 0 56px; color: var(--muted); font-size: 15px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; }
+
+  @media (max-width: 900px) {
+    .hero-grid, .two { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+    .hero-grid { padding: 32px 0 56px; }
+    section.band { padding: 60px 0; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px; }
+    .top nav a.hide-sm { display: none; }
+    .btn { width: 100%; justify-content: center; }
+    .demo { padding: 12px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .styles button, .btn { transition: border-color .15s, filter .15s; }
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="#">
+    <span class="brand-mark" aria-hidden="true">B</span>
+    Unicode Styler
+  </a>
+  <nav aria-label="Page">
+    <a class="hide-sm" href="#install">Install</a>
+    <a class="hide-sm" href="#how">How it works</a>
+    <a href="https://github.com/dalehassinger/UnicodeStyler">GitHub</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Bold and italic text you can paste anywhere.</h1>
+      <p class="lede">
+        A small, free Mac app that lives in your menu bar. Type your text, click a style, and paste it into
+        <strong>LinkedIn, X, Slack, Teams or email</strong>. The styling goes with it because it's built from Unicode characters, not formatting.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 17h12"/></svg>
+          Download for Mac
+        </a>
+        <a class="btn btn-quiet" href="https://github.com/dalehassinger/UnicodeStyler">View source</a>
+      </div>
+      <p class="fine">Version 1.1. Requires macOS 13 Ventura or later. Runs on Apple silicon and Intel.</p>
+    </div>
+
+    <div class="demo" aria-labelledby="demo-title">
+      <div class="demo-head">
+        <h2 id="demo-title">Try it here first</h2>
+        <span>Click a style to copy</span>
+      </div>
+      <label for="demo-input">Your text</label>
+      <textarea id="demo-input" spellcheck="false">Hello vCommunity 2026</textarea>
+      <ul class="styles" id="styles"></ul>
+      <p class="demo-foot" id="demo-status" role="status" aria-live="polite">This preview runs in your browser. The Mac app does the same thing from your menu bar.</p>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="band" aria-labelledby="features-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="features-title">One click from the menu bar</h2>
+        <p class="intro">No browser tab to find, no ads, nothing sent anywhere. It works offline.</p>
+        <ul class="features">
+          <li>
+            <h3>All 10 styles at once</h3>
+            <p>Serif and sans-serif bold, italic and bold italic, plus four alternating patterns. Every style previews live as you type.</p>
+          </li>
+          <li>
+            <h3>Click to copy</h3>
+            <p>A checkmark confirms the copy. Paste and Clear buttons handle the round trip from your clipboard.</p>
+          </li>
+          <li>
+            <h3>Light, Dark or System</h3>
+            <p>Pick an appearance in Settings, or let it follow macOS.</p>
+          </li>
+          <li>
+            <h3>Start at login</h3>
+            <p>One switch adds it to your Mac's Login Items, so it's always in the menu bar.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="shot" aria-label="Settings panel preview">
+        <h3>Settings</h3>
+        <p style="margin:0 0 8px;font-weight:700;font-size:14px">Appearance</p>
+        <div class="seg" id="theme-seg" role="group" aria-label="Page theme preview">
+          <button type="button" data-theme-choice="system" aria-pressed="true">System</button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        </div>
+        <p style="margin:0 0 8px;font-weight:700;font-size:14px">Startup</p>
+        <div class="toggle-row">
+          <span>Start Unicode Styler at login</span>
+          <span class="switch" aria-hidden="true"></span>
+        </div>
+        <p class="note">The appearance buttons above switch this page's theme, so you can see both.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="install" aria-labelledby="install-title">
+    <div class="wrap">
+      <h2 id="install-title">Install</h2>
+      <p class="intro">About a minute, and you only do the security step once.</p>
+      <div class="two">
+        <ol class="steps">
+          <li>
+            <div>
+              <h3>Download the zip</h3>
+              <p><a href="https://github.com/dalehassinger/UnicodeStyler/releases/latest/download/UnicodeStyler.zip">UnicodeStyler.zip</a> from the latest GitHub release.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Move it to Applications</h3>
+              <p>Double-click the zip to unpack it, then drag <strong>Unicode Styler</strong> into your Applications folder.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Open it once and approve it</h3>
+              <p>macOS will say it can't verify the developer. Follow the steps on the right. You only do this the first time.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Look in your menu bar</h3>
+              <p>Click the <strong>B/I/U</strong> icon, type your text, and click a style.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="callout">
+          <h3>Why macOS warns you, and how to open it</h3>
+          <p>The app isn't signed with a paid Apple Developer ID yet, so Gatekeeper blocks it the first time. It isn't damaged. To open it:</p>
+          <ol>
+            <li>Open the app once and click <strong>Done</strong> on the warning.</li>
+            <li>Go to <strong>System Settings › Privacy &amp; Security</strong>.</li>
+            <li>Scroll down and click <strong>Open Anyway</strong> next to Unicode Styler.</li>
+          </ol>
+          <p>Prefer Terminal? This removes the download flag:</p>
+          <pre><code>xattr -dr com.apple.quarantine "/Applications/Unicode Styler.app"</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="how" aria-labelledby="how-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="how-title">How it works</h2>
+        <p class="intro" style="margin-bottom:28px">The styled text isn't formatting. These are different characters. Unicode's Mathematical Alphanumeric Symbols block has complete alphabets in bold, italic and sans-serif, made for writing math. Each one starts at a fixed code point, so converting a letter is one addition.</p>
+        <p class="formula">styled = <em>start</em> + (letter − A)</p>
+        <ul class="limits">
+          <li><strong>Italic h is in a different place.</strong><span>Unicode already had ℎ as the Planck constant (U+210E), so the italic alphabet has a gap there. The app maps it separately.</span></li>
+          <li><strong>Italic has no digits.</strong><span>Numbers stay plain in italic styles. Bold styles have their own digits.</span></li>
+          <li><strong>Everything else passes through.</strong><span>Spaces, punctuation and emoji are left as they are.</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">A</th><th scope="col">Style</th><th scope="col">Starts at</th></tr></thead>
+            <tbody>
+              <tr><td class="glyph">𝐀</td><td>Bold</td><td><code>U+1D400</code></td></tr>
+              <tr><td class="glyph">𝐴</td><td>Italic</td><td><code>U+1D434</code></td></tr>
+              <tr><td class="glyph">𝑨</td><td>Bold italic</td><td><code>U+1D468</code></td></tr>
+              <tr><td class="glyph">𝗔</td><td>Sans bold</td><td><code>U+1D5D4</code></td></tr>
+              <tr><td class="glyph">𝘈</td><td>Sans italic</td><td><code>U+1D608</code></td></tr>
+              <tr><td class="glyph">𝘼</td><td>Sans bold italic</td><td><code>U+1D63C</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="aside">Use it for emphasis rather than whole posts. Screen readers may read these characters one at a time, and search won't match <span style="white-space:nowrap">𝐁𝐨𝐥𝐝</span> to Bold.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="source-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="source-title">Build it yourself</h2>
+        <p class="intro" style="margin-bottom:0">The whole app is one Swift file and a build script. There's no Xcode project. You only need the Command Line Tools (<code>xcode-select --install</code>).</p>
+      </div>
+      <pre><code>git clone https://github.com/dalehassinger/UnicodeStyler.git
+cd UnicodeStyler
+chmod +x build.sh
+./build.sh --install</code></pre>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Made by Dale Hassinger. Read more at <a href="https://www.vcrocs.info">vCROCS.info</a>.</span>
+    <span><a href="https://github.com/dalehassinger/UnicodeStyler">Source on GitHub</a></span>
+  </div>
+</footer>
+
+<script>
+  // Same mapping as the Mac app: start code points for A, a and 0 in each style.
+  const BASE = {
+    bold:           { upper: 0x1D400, lower: 0x1D41A, digit: 0x1D7CE },
+    italic:         { upper: 0x1D434, lower: 0x1D44E, digit: null, exceptions: { h: 0x210E } },
+    boldItalic:     { upper: 0x1D468, lower: 0x1D482, digit: null },
+    sansBold:       { upper: 0x1D5D4, lower: 0x1D5EE, digit: 0x1D7EC },
+    sansItalic:     { upper: 0x1D608, lower: 0x1D622, digit: null },
+    sansBoldItalic: { upper: 0x1D63C, lower: 0x1D656, digit: null },
+  };
+  const STYLES = [
+    ["Bold (serif)",               ["bold"]],
+    ["Italic (serif)",             ["italic"]],
+    ["Bold / italic (serif)",      ["boldItalic"]],
+    ["Bold (sans)",                ["sansBold"]],
+    ["Italic (sans)",              ["sansItalic"]],
+    ["Bold / italic (sans)",       ["sansBoldItalic"]],
+    ["Alternating Bold",           ["bold", "plain"]],
+    ["Alternating Italic",         ["italic", "plain"]],
+    ["Bold w/ Alternating Italic", ["bold", "boldItalic"]],
+    ["Italic Switch Serifs",       ["italic", "sansItalic"]],
+  ];
+
+  function convertChar(ch, base) {
+    if (base === "plain") return ch;
+    const m = BASE[base], c = ch.charCodeAt(0);
+    if (m.exceptions && m.exceptions[ch]) return String.fromCodePoint(m.exceptions[ch]);
+    if (c >= 65 && c <= 90)  return String.fromCodePoint(m.upper + c - 65);
+    if (c >= 97 && c <= 122) return String.fromCodePoint(m.lower + c - 97);
+    if (c >= 48 && c <= 57 && m.digit) return String.fromCodePoint(m.digit + c - 48);
+    return ch;
+  }
+  function stylize(text, cycle) {
+    let i = 0, out = "";
+    for (const ch of text) {
+      if (/^[A-Za-z0-9]$/.test(ch)) { out += convertChar(ch, cycle[i % cycle.length]); i++; }
+      else out += ch;
+    }
+    return out;
+  }
+
+  const input = document.getElementById("demo-input");
+  const list = document.getElementById("styles");
+  const status = document.getElementById("demo-status");
+  const defaultStatus = status.textContent;
+  let statusTimer;
+
+  const rows = STYLES.map(([label, cycle]) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.innerHTML = '<span><span class="style-name"></span><span class="style-out"></span></span><span class="copy-state">Copy</span>';
+    btn.querySelector(".style-name").textContent = label;
+    li.appendChild(btn);
+    list.appendChild(li);
+    btn.addEventListener("click", () => copy(btn, label));
+    return { btn, cycle, out: btn.querySelector(".style-out") };
+  });
+
+  function render() {
+    const text = input.value || "Your text here";
+    for (const r of rows) {
+      r.out.textContent = stylize(text, r.cycle);
+      r.btn.title = r.out.textContent;
+    }
+  }
+
+  async function copy(btn, label) {
+    const value = btn.querySelector(".style-out").textContent;
+    let ok = false;
+    try { await navigator.clipboard.writeText(value); ok = true; } catch (e) {
+      // Fallback for browsers that block the async clipboard API
+      const ta = document.createElement("textarea");
+      ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { ok = document.execCommand("copy"); } catch (_) {}
+      ta.remove();
+    }
+    rows.forEach(r => { r.btn.classList.remove("copied"); r.btn.querySelector(".copy-state").textContent = "Copy"; });
+    if (ok) {
+      btn.classList.add("copied");
+      btn.querySelector(".copy-state").textContent = "Copied";
+      status.textContent = label + " copied to your clipboard.";
+    } else {
+      status.textContent = "Your browser blocked copying. Select the text and copy it by hand.";
+    }
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.querySelector(".copy-state").textContent = "Copy";
+      status.textContent = defaultStatus;
+    }, 1600);
+  }
+
+  input.addEventListener("input", render);
+  render();
+
+  // Theme preview buttons switch the page theme, like the app's Appearance setting
+  const seg = document.getElementById("theme-seg");
+  function setTheme(choice) {
+    if (choice === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", choice);
+    seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.themeChoice === choice)));
+    try { localStorage.setItem("us-theme", choice); } catch (_) {}
+  }
+  seg.addEventListener("click", e => { const b = e.target.closest("button"); if (b) setTheme(b.dataset.themeChoice); });
+  try { const saved = localStorage.getItem("us-theme"); if (saved) setTheme(saved); } catch (_) {}
+</script>
+</body>
+</html>
