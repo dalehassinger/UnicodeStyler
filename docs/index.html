@@ -259,6 +259,19 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
   .dot.new { background: var(--success); } .dot.improved { background: var(--accent); } .dot.fixed { background: var(--warning); }
 
+  /* vCROCS promo */
+  .promo-band { padding: 0 0 72px; background: var(--page-bg); }
+  .promo {
+    display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 20px; align-items: center;
+    background: linear-gradient(135deg, rgba(73,175,217,.14), transparent 60%), var(--surface);
+    border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px;
+  }
+  .promo-mark { width: 56px; height: 56px; border-radius: 12px; background: var(--accent); color: var(--deep); display: grid; place-items: center; font-weight: 800; font-size: 16px; }
+  .promo h2 { font-size: 22px; margin: 0 0 2px; }
+  .promo p { margin: 0; color: var(--text-dim); font-size: 15px; }
+  .dl-web { border-color: var(--border-strong); }
+  .dl-web p { margin: 0; }
+
   /* CTA + footer */
   .cta { padding: 80px 0; text-align: center; background: radial-gradient(700px 300px at 50% 100%, rgba(73,175,217,.18), transparent 70%), var(--page-bg); border-top: 1px solid var(--border); }
   .cta h2 { font-size: clamp(26px, 3.4vw, 36px); margin: 0 0 12px; }
@@ -275,6 +288,9 @@
     .how-grid, .downloads { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 720px) {
+    .promo { grid-template-columns: auto minmax(0,1fr); }
+    .promo .btn { grid-column: 1 / -1; }
+    .cta .btn-ghost { margin: 10px 0 0 !important; }
     .topnav-links { display: none; }
     .topnav-inner { justify-content: space-between; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -317,6 +333,7 @@
       <a href="#how">How it works</a>
       <a href="#privacy">Privacy</a>
       <a href="#download">Download</a>
+      <a href="app/">Web version</a>
       <a href="#release-notes">Release notes</a>
     </nav>
     <div class="topnav-actions">
@@ -339,7 +356,7 @@
         </a>
         <a class="btn btn-ghost btn-lg" href="#try">Try it in your browser</a>
       </div>
-      <p class="hero-note">Free and open source. macOS 13 or later, Apple silicon and Intel.</p>
+      <p class="hero-note">Free and open source. macOS 13 or later, Apple silicon and Intel. On Windows or Linux? Use the <a href="app/">web version</a>.</p>
 
       <figure class="shot shot-hero" id="try">
         <div class="shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Unicode Styler</span></div>
@@ -350,7 +367,7 @@
           </div>
           <ul class="styles" id="styles"></ul>
         </div>
-        <figcaption id="demo-status" role="status" aria-live="polite">Type above and click any style to copy it. This preview runs in your browser, and the Mac app does the same thing from your menu bar.</figcaption>
+        <figcaption id="demo-status" role="status" aria-live="polite">Type above and click any style to copy it. The Mac app does the same thing from your menu bar. On Windows or Linux, bookmark the <a href="app/">full web version</a>.</figcaption>
       </figure>
     </div>
   </section>
@@ -535,6 +552,14 @@
         </article>
 
         <div class="side">
+          <article class="card dl-web">
+            <div class="dl-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+              <div><h3>Windows and Linux</h3><small>Any modern browser, nothing to install</small></div>
+            </div>
+            <p>The web version has all 10 styles, click to copy, keyboard shortcuts, and Light or Dark mode. Bookmark it, or install it from Edge or Chrome so it opens like an app. It works offline once loaded.</p>
+            <a class="btn btn-primary" href="app/" style="margin-top:16px">Open the web version</a>
+          </article>
           <article class="card">
             <div class="dl-head">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 17 6-6-6-6M12 19h8"/></svg>
@@ -597,7 +622,19 @@ cd UnicodeStyler
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 17h12"/></svg>
         Download for Mac
       </a>
+      <a class="btn btn-ghost btn-lg" href="app/" style="margin-left:8px">Open the web version</a>
     </div>
+  </section>
+
+  <section class="promo-band" aria-label="vCROCS.info">
+    <div class="wrap"><div class="promo">
+      <div class="promo-mark" aria-hidden="true">vC</div>
+      <div>
+        <h2>vCROCS.info</h2>
+        <p>More free tools, PowerShell automation and VMware Cloud Foundation guides from Dale Hassinger.</p>
+      </div>
+      <a class="btn btn-primary" href="https://www.vcrocs.info">Visit vCROCS.info</a>
+    </div></div>
   </section>
 </main>
 
@@ -608,7 +645,9 @@ cd UnicodeStyler
       <a href="#features">Features</a>
       <a href="#how">How it works</a>
       <a href="#download">Download</a>
+      <a href="app/">Web version</a>
       <a href="https://github.com/dalehassinger/UnicodeStyler">GitHub</a>
+      <a href="https://www.vcrocs.info">vCROCS.info</a>
     </nav>
     <p class="legal">Unicode Styler is an independent project. macOS is a trademark of Apple Inc.</p>
   </div>

@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unicode Styler Web</title>
+<meta name="description" content="Turn plain text into Unicode bold, italic and sans-serif styles you can paste into LinkedIn, X, Slack, Teams and email. Works in any browser on Windows, Linux or Mac.">
+<meta property="og:title" content="Unicode Styler Web">
+<meta property="og:description" content="Bold and italic text you can paste anywhere. Free, private, works in any browser.">
+<meta name="author" content="Dale Hassinger">
+<meta name="theme-color" content="#111c22">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script>
+  // Apply the saved theme before first paint so the page doesn't flash
+  try { const t = localStorage.getItem("usw-theme"); if (t && t !== "system") document.documentElement.dataset.theme = t; } catch (_) {}
+</script>
+<style>
+  /* Same Clarity palette as the Unicode Styler landing page */
+  :root {
+    color-scheme: dark;
+    --page-bg:#111c22; --app-bg:#1b2a32; --deep:#0e171c; --surface:#22343c; --surface-2:#2a3f49;
+    --border:#314351; --border-strong:#495a63;
+    --text:#eaedf0; --text-dim:#adbbc4; --text-faint:#798d99;
+    --accent:#49afd9; --accent-hover:#6ec3e6; --accent-ink:#0e171c; --accent-dim:rgba(73,175,217,.14);
+    --success:#60b515; --success-dim:rgba(96,181,21,.14);
+    --glow:rgba(73,175,217,.20); --gridline:rgba(173,187,196,.06);
+    --radius:10px;
+    --font:"Metropolis","Clarity City",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --page-bg:#f3f6f9; --app-bg:#ffffff; --deep:#e9eef3; --surface:#ffffff; --surface-2:#f0f6fa;
+      --border:#d5dde4; --border-strong:#b3c0ca;
+      --text:#1b2a32; --text-dim:#4f5f6b; --text-faint:#6b7c88;
+      --accent:#0072a3; --accent-hover:#005a82; --accent-ink:#ffffff; --accent-dim:rgba(0,114,163,.10);
+      --success:#2f8400; --success-dim:rgba(47,132,0,.10);
+      --glow:rgba(0,114,163,.12); --gridline:rgba(27,42,50,.05);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page-bg:#f3f6f9; --app-bg:#ffffff; --deep:#e9eef3; --surface:#ffffff; --surface-2:#f0f6fa;
+    --border:#d5dde4; --border-strong:#b3c0ca;
+    --text:#1b2a32; --text-dim:#4f5f6b; --text-faint:#6b7c88;
+    --accent:#0072a3; --accent-hover:#005a82; --accent-ink:#ffffff; --accent-dim:rgba(0,114,163,.10);
+    --success:#2f8400; --success-dim:rgba(47,132,0,.10);
+    --glow:rgba(0,114,163,.12); --gridline:rgba(27,42,50,.05);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0; color: var(--text); font: 16px/1.6 var(--font);
+    background:
+      radial-gradient(900px 420px at 50% -120px, var(--glow), transparent 70%),
+      var(--page-bg);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+    background-image: linear-gradient(var(--gridline) 1px, transparent 1px), linear-gradient(90deg, var(--gridline) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: linear-gradient(#000, transparent 420px); mask-image: linear-gradient(#000, transparent 420px);
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  kbd { font: 12px/1 var(--mono); border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; color: var(--text-dim); background: var(--surface); }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+  /* Top bar */
+  .topnav {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--page-bg) 80%, transparent);
+    -webkit-backdrop-filter: saturate(140%) blur(12px); backdrop-filter: saturate(140%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topnav-inner { display: flex; align-items: center; gap: 16px; height: 56px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; font-size: 17px; margin-right: auto; }
+  .brand:hover { color: var(--text); }
+  .brand-mark { width: 28px; height: 28px; border-radius: 7px; background: #49afd9; color: #0e171c; display: grid; place-items: center; font: italic 700 18px/1 Georgia, serif; }
+  .brand small { font-weight: 600; font-size: 12px; color: var(--accent); background: var(--accent-dim); border-radius: 999px; padding: 2px 8px; }
+  .topnav a.navlink { color: var(--text-dim); font-size: 14px; }
+  .topnav a.navlink:hover { color: var(--text); }
+
+  .icon-btn {
+    display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px;
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim); cursor: pointer;
+  }
+  .icon-btn:hover, .icon-btn[aria-expanded="true"] { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Settings popover */
+  .settings {
+    position: absolute; right: 20px; top: 62px; width: 290px; z-index: 30;
+    background: var(--app-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+    box-shadow: 0 24px 60px -24px rgba(0,0,0,.6);
+  }
+  .settings h2 { font-size: 14px; margin: 0 0 8px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+  .seg button { font: 14px/1 var(--font); padding: 9px 0; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--text-dim); cursor: pointer; }
+  .check input { margin-top: 4px; accent-color: var(--accent); }
+
+  /* Main tool */
+  main.wrap { padding-top: 40px; padding-bottom: 24px; }
+  .intro h1 { font-size: clamp(26px, 4vw, 34px); line-height: 1.15; letter-spacing: -.01em; margin: 0 0 6px; }
+  .intro p { margin: 0 0 22px; color: var(--text-dim); }
+
+  .tool { background: var(--app-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: 0 30px 80px -40px rgba(0,0,0,.6); }
+  .input-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .input-head label { font-weight: 700; font-size: 14px; margin-right: auto; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 7px;
+    font: 600 13px/1 var(--font); cursor: pointer; border: 1px solid var(--border-strong);
+    background: transparent; color: var(--text);
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn svg { width: 14px; height: 14px; }
+  textarea {
+    width: 100%; min-height: 96px; resize: vertical; display: block;
+    font: 17px/1.5 var(--font); color: var(--text);
+    background: var(--deep); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .counter { font-size: 12px; color: var(--text-faint); text-align: right; margin-top: 4px; }
+
+  .styles { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 7px; }
+  .styles button {
+    width: 100%; display: grid; grid-template-columns: 28px minmax(0,1fr) auto; align-items: center; gap: 12px;
+    text-align: left; font-family: inherit; color: var(--text); cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px;
+  }
+  .styles button:hover { border-color: var(--accent); background: var(--surface-2); }
+  .key { font: 600 12px/1 var(--mono); color: var(--text-faint); border: 1px solid var(--border); border-radius: 5px; height: 24px; display: grid; place-items: center; }
+  .style-name { display: block; font-size: 12px; color: var(--text-faint); line-height: 1.3; }
+  .style-out { display: block; font-size: 18px; line-height: 1.45; overflow-wrap: anywhere; }
+  .copy-state { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-faint); min-width: 70px; justify-content: flex-end; }
+  .copy-state svg { width: 15px; height: 15px; }
+  .styles button.copied { border-color: var(--success); background: var(--success-dim); }
+  .styles button.copied .copy-state { color: var(--success); font-weight: 700; }
+
+  .status { min-height: 24px; margin: 12px 2px 0; font-size: 14px; color: var(--text-faint); }
+  .hints { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 2px 0; font-size: 13px; color: var(--text-faint); }
+
+  /* Tips */
+  .tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 28px; }
+  .tip { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .tip h2 { font-size: 15px; margin: 0 0 6px; }
+  .tip p { margin: 0; font-size: 14px; color: var(--text-dim); }
+
+  /* vCROCS promo */
+  .promo {
+    margin: 40px 0 0; display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 18px; align-items: center;
+    background: linear-gradient(135deg, var(--accent-dim), transparent 60%), var(--surface);
+    border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px;
+  }
+  .promo-mark { width: 52px; height: 52px; border-radius: 12px; background: #49afd9; color: #0e171c; display: grid; place-items: center; font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+  .promo h2 { font-size: 20px; margin: 0 0 2px; }
+  .promo p { margin: 0; font-size: 14px; color: var(--text-dim); }
+  .promo .go { display: inline-flex; align-items: center; padding: 11px 18px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 15px; white-space: nowrap; }
+  .promo .go:hover { background: var(--accent-hover); color: var(--accent-ink); }
+
+  footer { padding: 26px 0 40px; color: var(--text-faint); font-size: 13px; }
+  .foot { display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: space-between; }
+  .foot nav { display: flex; flex-wrap: wrap; gap: 16px; }
+  .foot nav a { color: var(--text-dim); }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (max-width: 720px) {
+    .tips { grid-template-columns: minmax(0, 1fr); }
+    .topnav a.navlink { display: none; }
+    .promo { grid-template-columns: auto minmax(0,1fr); }
+    .promo .go { grid-column: 1 / -1; justify-content: center; }
+    .hints .kb { display: none; }
+  }
+  @media (max-width: 420px) {
+    .wrap { padding: 0 14px; }
+    .tool { padding: 12px; }
+    .styles button { grid-template-columns: minmax(0,1fr) auto; }
+    .key { display: none; }
+    .settings { right: 14px; left: 14px; width: auto; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .styles button, .btn, .icon-btn { transition: border-color .15s, background .15s, color .15s; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="wrap topnav-inner">
+    <a class="brand" href="./" aria-label="Unicode Styler Web">
+      <span class="brand-mark" aria-hidden="true">B</span>
+      Unicode Styler <small>Web</small>
+    </a>
+    <a class="navlink" href="../">Mac app</a>
+    <a class="navlink" href="https://github.com/dalehassinger/UnicodeStyler">GitHub</a>
+    <button class="icon-btn" id="install-btn" type="button" title="Install as an app" aria-label="Install as an app" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+    </button>
+    <button class="icon-btn" id="settings-btn" type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </div>
+  <div class="settings" id="settings" role="dialog" aria-label="Settings" hidden>
+    <h2>Appearance</h2>
+    <div class="seg" role="group" aria-label="Appearance">
+      <button type="button" data-theme-choice="system" aria-pressed="true">System</button>
+      <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+      <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+    </div>
+    <h2>Privacy</h2>
+    <label class="check"><input type="checkbox" id="remember"> <span>Remember my text in this browser between visits</span></label>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>Bold and italic text you can paste anywhere</h1>
+    <p>Type your text, click a style, and paste it into LinkedIn, X, Slack, Teams or email. Works in any browser on Windows, Linux or Mac.</p>
+  </div>
+
+  <section class="tool" aria-label="Unicode Styler">
+    <div class="input-head">
+      <label for="input">Your text</label>
+      <button class="btn" type="button" id="paste-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+        Paste
+      </button>
+      <button class="btn" type="button" id="clear-btn">Clear</button>
+    </div>
+    <textarea id="input" spellcheck="false" placeholder="Type or paste your text here" autofocus></textarea>
+    <div class="counter" id="counter" aria-hidden="true"></div>
+    <ul class="styles" id="styles"></ul>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <div class="hints">
+    <span class="kb">Shortcuts: <kbd>Alt</kbd> + <kbd>1</kbd> to <kbd>0</kbd> copies a style</span>
+    <span>Bookmark this page: <kbd id="bm-key">Ctrl</kbd> + <kbd>D</kbd></span>
+    <span id="install-hint">In Edge or Chrome, use <strong>Install</strong> in the address bar to open it like an app.</span>
+  </div>
+
+  <section class="tips" aria-label="Tips">
+    <div class="tip">
+      <h2>Style the hook</h2>
+      <p>LinkedIn shows two or three lines before "see more". Make the first line bold and leave the rest plain.</p>
+    </div>
+    <div class="tip">
+      <h2>Skip hashtags</h2>
+      <p>A styled hashtag is a different hashtag, so nobody will find it. Keep hashtags and names plain.</p>
+    </div>
+    <div class="tip">
+      <h2>Private by design</h2>
+      <p>Everything runs in your browser. Your text is never sent anywhere, and it works offline once loaded.</p>
+    </div>
+  </section>
+
+  <aside class="promo" aria-label="vCROCS.info">
+    <div class="promo-mark" aria-hidden="true">vC</div>
+    <div>
+      <h2>vCROCS.info</h2>
+      <p>More free tools, PowerShell automation and VMware Cloud Foundation guides from Dale Hassinger.</p>
+    </div>
+    <a class="go" href="https://www.vcrocs.info">Visit vCROCS.info</a>
+  </aside>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Unicode Styler Web, made by Dale Hassinger at <a href="https://www.vcrocs.info">vCROCS.info</a></span>
+    <nav aria-label="Footer">
+      <a href="../">Mac app</a>
+      <a href="../#how">How it works</a>
+      <a href="https://github.com/dalehassinger/UnicodeStyler">Source on GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Same mapping as the Mac app: start code points for A, a and 0 in each style.
+  const BASE = {
+    bold:           { upper: 0x1D400, lower: 0x1D41A, digit: 0x1D7CE },
+    italic:         { upper: 0x1D434, lower: 0x1D44E, digit: null, exceptions: { h: 0x210E } },
+    boldItalic:     { upper: 0x1D468, lower: 0x1D482, digit: null },
+    sansBold:       { upper: 0x1D5D4, lower: 0x1D5EE, digit: 0x1D7EC },
+    sansItalic:     { upper: 0x1D608, lower: 0x1D622, digit: null },
+    sansBoldItalic: { upper: 0x1D63C, lower: 0x1D656, digit: null },
+  };
+  const STYLES = [
+    ["Bold (serif)",               ["bold"]],
+    ["Italic (serif)",             ["italic"]],
+    ["Bold / italic (serif)",      ["boldItalic"]],
+    ["Bold (sans)",                ["sansBold"]],
+    ["Italic (sans)",              ["sansItalic"]],
+    ["Bold / italic (sans)",       ["sansBoldItalic"]],
+    ["Alternating Bold",           ["bold", "plain"]],
+    ["Alternating Italic",         ["italic", "plain"]],
+    ["Bold w/ Alternating Italic", ["bold", "boldItalic"]],
+    ["Italic Switch Serifs",       ["italic", "sansItalic"]],
+  ];
+  function convertChar(ch, base) {
+    if (base === "plain") return ch;
+    const m = BASE[base], c = ch.charCodeAt(0);
+    if (m.exceptions && m.exceptions[ch]) return String.fromCodePoint(m.exceptions[ch]);
+    if (c >= 65 && c <= 90)  return String.fromCodePoint(m.upper + c - 65);
+    if (c >= 97 && c <= 122) return String.fromCodePoint(m.lower + c - 97);
+    if (c >= 48 && c <= 57 && m.digit) return String.fromCodePoint(m.digit + c - 48);
+    return ch;
+  }
+  function stylize(text, cycle) {
+    let i = 0, out = "";
+    for (const ch of text) {
+      if (/^[A-Za-z0-9]$/.test(ch)) { out += convertChar(ch, cycle[i % cycle.length]); i++; }
+      else out += ch;
+    }
+    return out;
+  }
+
+  const $ = id => document.getElementById(id);
+  const input = $("input"), list = $("styles"), status = $("status"), counter = $("counter");
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} },
+    del(k) { try { localStorage.removeItem(k); } catch (_) {} },
+  };
+
+  // Rows
+  const rows = STYLES.map(([label, cycle], idx) => {
+    const key = idx === 9 ? "0" : String(idx + 1);
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.setAttribute("aria-keyshortcuts", "Alt+" + key);
+    btn.innerHTML =
+      '<span class="key" aria-hidden="true"></span>' +
+      '<span><span class="style-name"></span><span class="style-out"></span></span>' +
+      '<span class="copy-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>Copy</span></span>';
+    btn.querySelector(".key").textContent = key;
+    btn.querySelector(".style-name").textContent = label;
+    li.appendChild(btn); list.appendChild(li);
+    btn.addEventListener("click", () => copy(row));
+    const row = { btn, cycle, label, key, out: btn.querySelector(".style-out"), state: btn.querySelector(".copy-state span") };
+    return row;
+  });
+
+  function render() {
+    const text = input.value;
+    const shown = text || "Your text here";
+    for (const r of rows) r.out.textContent = stylize(shown, r.cycle);
+    counter.textContent = text ? [...text].length + " characters" : "";
+    if ($("remember").checked) store.set("usw-text", text);
+  }
+
+  let timer;
+  async function copy(row) {
+    if (!input.value) { status.textContent = "Type some text first, then click a style to copy it."; return; }
+    const value = stylize(input.value, row.cycle);
+    let ok = false;
+    try { await navigator.clipboard.writeText(value); ok = true; } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { ok = document.execCommand("copy"); } catch (_) {}
+      ta.remove();
+    }
+    rows.forEach(r => { r.btn.classList.remove("copied"); r.state.textContent = "Copy"; });
+    if (ok) {
+      row.btn.classList.add("copied"); row.state.textContent = "Copied";
+      status.textContent = row.label + " copied. Paste it wherever you like.";
+    } else {
+      status.textContent = "Your browser blocked copying. Select the styled text and copy it by hand.";
+    }
+    clearTimeout(timer);
+    timer = setTimeout(() => { row.btn.classList.remove("copied"); row.state.textContent = "Copy"; status.textContent = ""; }, 1800);
+  }
+
+  input.addEventListener("input", render);
+  $("clear-btn").addEventListener("click", () => { input.value = ""; render(); input.focus(); status.textContent = ""; });
+  $("paste-btn").addEventListener("click", async () => {
+    try { input.value = await navigator.clipboard.readText(); render(); input.focus(); }
+    catch (_) { status.textContent = "Your browser blocked reading the clipboard. Click in the box and press Ctrl+V."; input.focus(); }
+  });
+
+  // Alt+1..0 copies a style
+  document.addEventListener("keydown", e => {
+    if (!e.altKey || e.ctrlKey || e.metaKey) return;
+    const m = /^Digit(\d)$/.exec(e.code);
+    if (!m) return;
+    const idx = m[1] === "0" ? 9 : Number(m[1]) - 1;
+    e.preventDefault();
+    copy(rows[idx]);
+  });
+
+  // Settings: theme + remember text
+  const settings = $("settings"), sBtn = $("settings-btn");
+  sBtn.addEventListener("click", () => {
+    const open = settings.hidden;
+    settings.hidden = !open; sBtn.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("click", e => {
+    if (!settings.hidden && !settings.contains(e.target) && !sBtn.contains(e.target)) { settings.hidden = true; sBtn.setAttribute("aria-expanded", "false"); }
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !settings.hidden) { settings.hidden = true; sBtn.setAttribute("aria-expanded", "false"); sBtn.focus(); } });
+
+  function setTheme(choice) {
+    if (choice === "system") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = choice;
+    settings.querySelectorAll("[data-theme-choice]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.themeChoice === choice)));
+    store.set("usw-theme", choice);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    meta.content = getComputedStyle(document.documentElement).getPropertyValue("--page-bg").trim();
+  }
+  settings.addEventListener("click", e => { const b = e.target.closest("[data-theme-choice]"); if (b) setTheme(b.dataset.themeChoice); });
+  setTheme(store.get("usw-theme") || "system");
+
+  const remember = $("remember");
+  remember.checked = store.get("usw-remember") === "1";
+  remember.addEventListener("change", () => {
+    store.set("usw-remember", remember.checked ? "1" : "0");
+    if (remember.checked) store.set("usw-text", input.value); else store.del("usw-text");
+  });
+  if (remember.checked) input.value = store.get("usw-text") || "";
+
+  // Platform-aware bookmark key
+  if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) $("bm-key").textContent = "⌘";
+
+  // Install as an app (Edge / Chrome) and offline support
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredPrompt = e; $("install-btn").hidden = false; });
+  $("install-btn").addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null; $("install-btn").hidden = true;
+  });
+  window.addEventListener("appinstalled", () => { $("install-btn").hidden = true; $("install-hint").hidden = true; });
+  if (window.matchMedia("(display-mode: standalone)").matches) $("install-hint").hidden = true;
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+
+  render();
+</script>
+</body>
+</html>
